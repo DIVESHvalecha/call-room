@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Call Room — Predict Rare, Collect Rare
 
-## Getting Started
+Live second-screen cricket companion (Broadcast Booth theme). Fans enter a match room, make one call per over / at key moments, get rarity-scored (rare-correct beats common-correct), climb a live board, and reveal a rarity-tiered collectible card at full time. Daily trivia feeds card rarity.
 
-First, run the development server:
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd call-room
+npm install
+npm run dev        # http://localhost:3000 — test at 390px width + one real phone
+npm run build      # must pass before recording/deploy
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Env (optional — app works cached without it):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+GEMINI_API_KEY=your_key
+GEMINI_MODEL=gemini-2.0-flash   # or whichever current Flash your key supports
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What it does (90s path)
 
-## Learn More
+Lobby (match list + daily) → Preview (score bug + reactions + board + Enter) → Contest (5 calls, 15s timer, lock, rarity bars, flying +25, board flips, fast-forward 10.2→11.3 with live scorecard) → Full time (board hidden, canvas scratch) → Mint (count-up, tier, rarity score + reward, share PNG, challenge link) → Album (6 slots) → Daily (random 3-Q set, visible picks, dynamic 132-board feeding rarity).
 
-To learn more about Next.js, take a look at the following resources:
+## Mock-map (interview only — not on screen)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Area | Video shows | Reality today | Prod path |
+|---|---|---|---|
+| Match feed | Ticking replay + FF bar | Scripted `slice.json` + `GAPS` ball outcomes | Ball-by-ball websocket adapter |
+| Crowd 128 | Jitter counter + floating reactions | Simulated splits + scripted pools | Sockets + presence |
+| Questions | AI-looking calls + dynamics lines | Cached copy + 1 live Gemini path (`/api/dynamics`, `/api/parse`) with offline badge | Nightly question bank + moderation queue |
+| Scoring | Rarity math + tiers | Pure functions in `lib/score.ts` (auditable, tested) | Server timestamps + fingerprint anti-farm |
+| Board/album | Live ranks + unlocks | Local state + localStorage | Auth + DB + season service |
+| Images | Gradient/emoji cards | CSS/SVG only (no player photos = no rights issue) | Licensed feed via FanCode/BCCI |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Limits (stated in submission)
 
-## Deploy on Vercel
+- One replay slice (Target 155, 85/2 in 10.2 → ~14.0), 5 contest calls + 4 daily sets (random 1 shown).
+- Room of 128 simulated; daily 132 simulated — your ranks move for real within the sim.
+- No auth, no backend persistence, no live API; works offline on cached copy.
+- Tier/rarity thresholds are design choices for demo feel, to be calibrated on real data.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tools used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Gemini Flash (current): dynamics lines, SOS explainer, parse schema, question/lore drafting + offline vault bootstrap (human-curated, frozen).
+- Coding assistant: scaffolding, animation wiring, test table.
+- Libraries: Next.js 14, Framer Motion (transform/opacity only), html-to-image. No images; CSS/SVG/emoji only.
+
+## Metric hypotheses (to A/B, not claimed)
+
+Calls per match, next-day return via daily, card forwards per match. Success = longer death-over sessions + return without money.

@@ -1,0 +1,463 @@
+{
+  "wicket": [
+    {
+      "id": "w1",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "New batter {batter} faces his first 6 balls \u2014 how many runs?",
+      "options": [
+        "0-2",
+        "3-6",
+        "7-11",
+        "12+"
+      ],
+      "splits": {
+        "A": 38,
+        "B": 36,
+        "C": 16,
+        "D": 10
+      },
+      "dynamics": "New batters block first, then release."
+    },
+    {
+      "id": "w2",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "Another wicket in the next 6 balls?",
+      "options": [
+        "Yes, bowled/LBW",
+        "Yes, caught",
+        "No wicket",
+        "Run out chaos"
+      ],
+      "splits": {
+        "A": 16,
+        "B": 18,
+        "C": 54,
+        "D": 12
+      },
+      "dynamics": "Clusters come in pairs \u2014 or not at all."
+    },
+    {
+      "id": "w3",
+      "kind": "decision",
+      "resolve": "immediate",
+      "text": "How did {outBatter} get out on {overLabel}?",
+      "options": [
+        "Caught",
+        "Bowled",
+        "LBW",
+        "Run out"
+      ],
+      "splits": {
+        "A": 40,
+        "B": 25,
+        "C": 20,
+        "D": 15
+      },
+      "dynamics": "Read the dismissal, not the replay."
+    },
+    {
+      "id": "w4",
+      "kind": "decision",
+      "resolve": "immediate",
+      "text": "{bowler} has struck \u2014 attack or contain the new batter?",
+      "options": [
+        "Attack with slip in",
+        "Contain both ends",
+        "Change ends",
+        "Bring spin on"
+      ],
+      "answerIdx": 0,
+      "splits": {
+        "A": 46,
+        "B": 30,
+        "C": 14,
+        "D": 10
+      },
+      "dynamics": "New batter, hard ball, slips in \u2014 attack."
+    },
+    {
+      "id": "w5",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "Strike rotates after the fall - next 6 balls bring?",
+      "options": [
+        "0-4",
+        "5-8",
+        "9-13",
+        "14+"
+      ],
+      "splits": {
+        "A": 30,
+        "B": 44,
+        "C": 18,
+        "D": 8
+      },
+      "dynamics": "Rebuilding costs a boundary or two."
+    },
+    {
+      "id": "w6",
+      "kind": "decision",
+      "resolve": "immediate",
+      "text": "Who walks in next?",
+      "options": [
+        "__IN1__",
+        "__IN2__",
+        "__IN3__",
+        "__IN4__"
+      ],
+      "splits": {
+        "A": 30,
+        "B": 28,
+        "C": 24,
+        "D": 18
+      },
+      "dynamics": "Watch the stairs, not the screen."
+    }
+  ],
+  "pressure": [
+    {
+      "id": "p1",
+      "kind": "over",
+      "resolve": "overEnd",
+      "text": "This over ({bowler} to {batter}) goes for?",
+      "options": [
+        "0-5",
+        "6-10",
+        "11-15",
+        "16+"
+      ],
+      "splits": {
+        "A": 24,
+        "B": 50,
+        "C": 18,
+        "D": 8
+      },
+      "dynamics": "Squeeze first, boundary then singles."
+    },
+    {
+      "id": "p2",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "Boundaries in the next 6 balls?",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3+"
+      ],
+      "splits": {
+        "A": 26,
+        "B": 48,
+        "C": 18,
+        "D": 8
+      },
+      "dynamics": "One release shot per six under pressure."
+    },
+    {
+      "id": "p3",
+      "kind": "decision",
+      "resolve": "immediate",
+      "text": "Last over went for {lastOverRuns} \u2014 was persisting with {bowler} the right call?",
+      "options": [
+        "Yes, backed him",
+        "No, should have changed",
+        "Too defensive",
+        "Too attacking"
+      ],
+      "answerIdx": 0,
+      "splits": {
+        "A": 42,
+        "B": 28,
+        "C": 16,
+        "D": 14
+      },
+      "dynamics": "Trust shows in the field settings."
+    },
+    {
+      "id": "p4",
+      "kind": "over",
+      "resolve": "overEnd",
+      "text": "A wicket falls before this over ends?",
+      "options": [
+        "Yes",
+        "No",
+        "Run out only",
+        "Wide-fest instead"
+      ],
+      "splits": {
+        "A": 30,
+        "B": 52,
+        "C": 8,
+        "D": 10
+      },
+      "dynamics": "Pressure manufactures mistakes."
+    },
+    {
+      "id": "p5",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "{batter} is {batterRuns}({batterBalls}) - his next 6 balls?",
+      "options": [
+        "0-3",
+        "4-7",
+        "8-12",
+        "13+"
+      ],
+      "splits": {
+        "A": 28,
+        "B": 44,
+        "C": 20,
+        "D": 8
+      },
+      "dynamics": "Set or stuck? Six balls tell."
+    },
+    {
+      "id": "p6",
+      "kind": "over",
+      "resolve": "overEnd",
+      "text": "Runs off {bowler} ({bowlerFig}) this over?",
+      "options": [
+        "0-5",
+        "6-10",
+        "11-15",
+        "16+"
+      ],
+      "splits": {
+        "A": 26,
+        "B": 48,
+        "C": 18,
+        "D": 8
+      },
+      "dynamics": "Figures tell you who the captain trusts."
+    }
+  ],
+  "momentum": [
+    {
+      "id": "m1",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "{batter} is flowing \u2014 next 6 balls bring?",
+      "options": [
+        "0-6",
+        "7-12",
+        "13-18",
+        "Out swinging"
+      ],
+      "splits": {
+        "A": 22,
+        "B": 48,
+        "C": 18,
+        "D": 12
+      },
+      "dynamics": "Set batters milk, one big over per four."
+    },
+    {
+      "id": "m2",
+      "kind": "over",
+      "resolve": "overEnd",
+      "text": "This over total?",
+      "options": [
+        "0-6",
+        "7-12",
+        "13-18",
+        "Wicket over"
+      ],
+      "splits": {
+        "A": 24,
+        "B": 46,
+        "C": 18,
+        "D": 12
+      },
+      "dynamics": "Flow finds gaps every few balls."
+    },
+    {
+      "id": "m3",
+      "kind": "decision",
+      "resolve": "immediate",
+      "text": "How did the last boundary come?",
+      "options": [
+        "Four along ground",
+        "Six over the rope",
+        "Edges/fortune",
+        "Extras"
+      ],
+      "splits": {
+        "A": 38,
+        "B": 30,
+        "C": 20,
+        "D": 12
+      },
+      "dynamics": "Watch the last scoring shot, not the hype."
+    },
+    {
+      "id": "m4",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "Next wicket arrives within 12 balls?",
+      "options": [
+        "Yes",
+        "No",
+        "Run out",
+        "Retired hurt drama"
+      ],
+      "splits": {
+        "A": 30,
+        "B": 52,
+        "C": 10,
+        "D": 8
+      },
+      "dynamics": "Flow either converts or collapses."
+    },
+    {
+      "id": "m5",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "Stand worth {pship} - next 6 balls add?",
+      "options": [
+        "0-5",
+        "6-10",
+        "11-15",
+        "Wicket ends it"
+      ],
+      "splits": {
+        "A": 24,
+        "B": 46,
+        "C": 18,
+        "D": 12
+      },
+      "dynamics": "Stands convert or collapse, rarely stall."
+    },
+    {
+      "id": "m6",
+      "kind": "decision",
+      "resolve": "immediate",
+      "text": "Who is the set danger right now?",
+      "options": [
+        "__BAT1__",
+        "__BAT2__",
+        "__BAT3__",
+        "__BAT4__"
+      ],
+      "splits": {
+        "A": 32,
+        "B": 30,
+        "C": 22,
+        "D": 16
+      },
+      "dynamics": "Scoreboard never lies, read it."
+    }
+  ],
+  "standard": [
+    {
+      "id": "s1",
+      "kind": "over",
+      "resolve": "overEnd",
+      "text": "This over yields?",
+      "options": [
+        "0-5",
+        "6-10",
+        "11-15",
+        "Wicket over"
+      ],
+      "answerIdx": 1,
+      "splits": {
+        "A": 24,
+        "B": 52,
+        "C": 16,
+        "D": 8
+      },
+      "dynamics": "Middle overs hover around a run a ball."
+    },
+    {
+      "id": "s2",
+      "kind": "over",
+      "resolve": "nextBowler",
+      "text": "Who bowls the next over?",
+      "options": [
+        "__NEXT1__",
+        "__NEXT2__",
+        "__NEXT3__",
+        "__NEXT4__"
+      ],
+      "splits": {
+        "A": 30,
+        "B": 28,
+        "C": 24,
+        "D": 18
+      },
+      "dynamics": "Rotation tells you who the captain trusts."
+    },
+    {
+      "id": "s3",
+      "kind": "decision",
+      "resolve": "immediate",
+      "text": "What happened on {overLabel}?",
+      "options": [
+        "__EVT1__",
+        "__EVT2__",
+        "__EVT3__",
+        "__EVT4__"
+      ],
+      "dynamics": "Eyes on the ball, not the noise."
+    },
+    {
+      "id": "s4",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "{batter} scores what off the next 6 balls?",
+      "options": [
+        "0-3",
+        "4-7",
+        "8-12",
+        "13+"
+      ],
+      "splits": {
+        "A": 28,
+        "B": 44,
+        "C": 20,
+        "D": 8
+      },
+      "dynamics": "Six balls tell you the pitch."
+    },
+    {
+      "id": "s5",
+      "kind": "over",
+      "resolve": "balls6",
+      "text": "Extras in the next 6 balls?",
+      "options": [
+        "0",
+        "1-2",
+        "3-5",
+        "6+"
+      ],
+      "splits": {
+        "A": 48,
+        "B": 34,
+        "C": 12,
+        "D": 6
+      },
+      "dynamics": "Discipline shows in the extras column."
+    },
+    {
+      "id": "s6",
+      "kind": "decision",
+      "resolve": "immediate",
+      "text": "Highest strike rate right now (min 10 balls)?",
+      "options": [
+        "__SR1__",
+        "__SR2__",
+        "__SR3__",
+        "__SR4__"
+      ],
+      "splits": {
+        "A": 30,
+        "B": 30,
+        "C": 24,
+        "D": 16
+      },
+      "dynamics": "SR column, not reputation."
+    }
+  ]
+}

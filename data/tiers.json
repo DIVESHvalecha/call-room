@@ -1,0 +1,4 @@
+{
+  "tiers": { "1": "Diamond", "2-3": "Platinum", "4-10": "Gold", "else": "Silver" },
+  "weights": { "match": 0.7, "daily": 0.3, "dailyCap": 30, "streakCap": 15 }
+}

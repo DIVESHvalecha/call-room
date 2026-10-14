@@ -1,0 +1,108 @@
+{
+  "sets": [
+    [
+      {
+        "id": "d1a",
+        "kind": "situational",
+        "text": "70 needed off 36, 8 wkts in hand — promote the finisher now?",
+        "options": ["Yes, now", "Wait 2 overs", "No, hold back", "Send tailender"],
+        "answerIdx": 0,
+        "explainer_cached": "RRR ~11.7 — an extra 12 balls for your best hitter beats holding back."
+      },
+      {
+        "id": "d1b",
+        "kind": "historic",
+        "text": "2019 semifinal: what did India need when Dhoni was run out?",
+        "options": ["25 off 10", "32 off 13", "20 off 12", "15 off 8"],
+        "answerIdx": 0,
+        "explainer_cached": "25 off 10 with one wicket left — the margins that decide knockouts."
+      },
+      {
+        "id": "d1c",
+        "kind": "rule",
+        "text": "Mankad run-out — legal or against the spirit?",
+        "options": ["Legal, warn once", "Legal, no warning needed", "Illegal", "Dead ball"],
+        "answerIdx": 1,
+        "explainer_cached": "Legal since the 2022 law change — no warning required."
+      }
+    ],
+    [
+      {
+        "id": "d2a",
+        "kind": "situational",
+        "text": "Death over, set batter vs new bowler — take the single or keep strike?",
+        "options": ["Keep strike", "Take single", "Go big first ball", "Leave it to partner"],
+        "answerIdx": 0,
+        "explainer_cached": "Set batter faces ~8 more balls of value — strike retained wins sims."
+      },
+      {
+        "id": "d2b",
+        "kind": "historic",
+        "text": "Yuvraj's 6 sixes — who was the bowler?",
+        "options": ["Broad", "Flintoff", "Anderson", "Mascarenhas"],
+        "answerIdx": 0,
+        "explainer_cached": "Broad, Durban 2007 — 12-ball fifty still stands."
+      },
+      {
+        "id": "d2c",
+        "kind": "rule",
+        "text": "How many fielders allowed outside the circle in death overs?",
+        "options": ["4", "5", "6", "Unlimited"],
+        "answerIdx": 1,
+        "explainer_cached": "Max 5 outside at any point in a T20."
+      }
+    ],
+    [
+      {
+        "id": "d3a",
+        "kind": "situational",
+        "text": "Spinner with 12 to defend, long boundary one side — where do you bowl?",
+        "options": ["Into the big side", "Wide of off", "At the stumps", "Short and slow"],
+        "answerIdx": 0,
+        "explainer_cached": "Force the big hit to the big side — percentages over bravery."
+      },
+      {
+        "id": "d3b",
+        "kind": "historic",
+        "text": "Last-ball six to win a final — who did it for India in 2016 Asia Cup style finishes?",
+        "options": ["Dhoni", "Kohli", "Hardik", "Jadeja"],
+        "answerIdx": 0,
+        "explainer_cached": "Dhoni's finishing template — calm hands, deep breath."
+      },
+      {
+        "id": "d3c",
+        "kind": "rule",
+        "text": "DRS: umpire's call on hitting means?",
+        "options": ["Out stays out", "Not out stays", "Both stand", "Review retained only"],
+        "answerIdx": 2,
+        "explainer_cached": "On-field call stands either way on umpire's call."
+      }
+    ],
+    [
+      {
+        "id": "d4a",
+        "kind": "situational",
+        "text": "Powerplay done, 55/1 — accelerate or consolidate?",
+        "options": ["Attack spin now", "Milksingles 2 overs", "Promote hitter", "Same tempo"],
+        "answerIdx": 0,
+        "explainer_cached": "Spin in overs 7-9 goes at 7.2 vs pace 8.9 — attack the matchup."
+      },
+      {
+        "id": "d4b",
+        "kind": "historic",
+        "text": "Highest successful T20 WC chase?",
+        "options": ["172", "183", "192", "200"],
+        "answerIdx": 2,
+        "explainer_cached": "192 — set the bar for modern chasing."
+      },
+      {
+        "id": "d4c",
+        "kind": "rule",
+        "text": "Free hit after a front-foot no-ball — can you be out stumped?",
+        "options": ["Yes", "No, only run out", "Yes if advancing", "Dead ball"],
+        "answerIdx": 1,
+        "explainer_cached": "Only run out (plus a few rare modes) — stumped is safe."
+      }
+    ]
+  ]
+}

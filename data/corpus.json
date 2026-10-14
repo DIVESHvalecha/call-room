@@ -1,0 +1,49 @@
+{
+  "checkpoints": [
+    {
+      "afterEvent": 5,
+      "pool": [
+        { "id": "c1a", "kind": "over", "text": "Next over: total runs?", "options": ["0-5", "6-10", "11-15", "16+"], "answerIdx": 1, "splits": { "A": 20, "B": 55, "C": 18, "D": 7 }, "dynamics": "Chahal slows it; singles flow." },
+        { "id": "c1b", "kind": "decision", "text": "Chahal leaking — pull him or persist?", "options": ["Pull now", "One more over", "Change ends", "Bring pace"], "answerIdx": 1, "splits": { "A": 28, "B": 44, "C": 16, "D": 12 }, "dynamics": "One expensive over isn't a spell — captains persist." },
+        { "id": "c1c", "kind": "future", "text": "Where is this chase heading by 13.0?", "options": ["Ahead of rate", "Just behind", "Wicket cluster", "Runaway lead"], "answerIdx": 1, "splits": { "A": 30, "B": 42, "C": 18, "D": 10 }, "dynamics": "Par line ~95 at 13 — chase wobbles around it." },
+        { "id": "c1d", "kind": "over", "text": "Boundaries in next 6 balls?", "options": ["0", "1", "2", "3+"], "answerIdx": 1, "splits": { "A": 25, "B": 50, "C": 18, "D": 7 }, "dynamics": "One loose ball per over is the norm." }
+      ]
+    },
+    {
+      "afterEvent": 10,
+      "pool": [
+        { "id": "c2a", "kind": "decision", "text": "LBW shout on Maxwell — review?", "options": ["Review: hitting", "Review: umpire's call", "No review", "Ask keeper"], "answerIdx": 2, "splits": { "A": 30, "B": 35, "C": 25, "D": 10 }, "dynamics": "Impact outside off — review burns." },
+        { "id": "c2b", "kind": "over", "text": "Axar's next over goes for?", "options": ["0-6", "7-11", "12-16", "Wicket over"], "answerIdx": 3, "splits": { "A": 22, "B": 40, "C": 22, "D": 16 }, "dynamics": "Left-arm spin to two right-handers invites the big shot — and the mistake." },
+        { "id": "c2c", "kind": "future", "text": "Bigger threat next 3 overs?", "options": ["Spin choke", "Pace strikes", "Fielding lapses", "New-ball swing"], "answerIdx": 1, "splits": { "A": 34, "B": 38, "C": 16, "D": 12 }, "dynamics": "Bumrah looms — pace decides the middle." },
+        { "id": "c2d", "kind": "decision", "text": "Promote Stoinis or hold him back?", "options": ["Promote now", "Hold 2 overs", "Send keeper", "Pinch-hitter"], "answerIdx": 0, "splits": { "A": 38, "B": 32, "C": 18, "D": 12 }, "dynamics": "Fresh legs vs spin beats waiting." }
+      ]
+    },
+    {
+      "afterEvent": 15,
+      "pool": [
+        { "id": "c3a", "kind": "over", "text": "12th over (Bumrah): outcome?", "options": ["0-7 runs", "8-14 runs", "15+ runs", "Wicket"], "answerIdx": 3, "splits": { "A": 12, "B": 64, "C": 8, "D": 16 }, "dynamics": "Head holes out going big — rare wicket call wins." },
+        { "id": "c3b", "kind": "decision", "text": "Bumrah: yorker or slower-ball plan?", "options": ["Yorker assault", "Slower mix", "Short barrage", "Wide lines"], "answerIdx": 1, "splits": { "A": 40, "B": 34, "C": 14, "D": 12 }, "dynamics": "Mix beats radar — slower balls buy the mistake." },
+        { "id": "c3c", "kind": "future", "text": "If a wicket falls now, RRR goes?", "options": ["7→9", "7→11", "Stays flat", "Drops"], "answerIdx": 0, "splits": { "A": 45, "B": 30, "C": 15, "D": 10 }, "dynamics": "New batter vs spin, rate climbs two runs." },
+        { "id": "c3d", "kind": "over", "text": "Head's next 6 balls make?", "options": ["0-6", "7-13", "14-20", "Out cheaply"], "answerIdx": 3, "splits": { "A": 20, "B": 44, "C": 20, "D": 16 }, "dynamics": "Set but swinging — the big shot ends it." }
+      ]
+    },
+    {
+      "afterEvent": 21,
+      "pool": [
+        { "id": "c4a", "kind": "decision", "text": "Wade sweeping everything — stop the sweep how?", "options": ["Top of off", "Leg-stump line", "Slower + wider", "Bouncer"], "answerIdx": 2, "splits": { "A": 30, "B": 28, "C": 30, "D": 12 }, "dynamics": "Slower and wider kills sweep timing." },
+        { "id": "c4b", "kind": "over", "text": "Next over yields?", "options": ["0-6", "7-12", "13-18", "Wicket maiden-ish"], "answerIdx": 1, "splits": { "A": 26, "B": 46, "C": 18, "D": 10 }, "dynamics": "Middle overs hover around 8-9." },
+        { "id": "c4c", "kind": "future", "text": "Match decided by?", "options": ["18th over", "Last over", "19th over", "Already decided"], "answerIdx": 1, "splits": { "A": 24, "B": 42, "C": 24, "D": 10 }, "dynamics": "Chases this tight live for the final six balls." },
+        { "id": "c4d", "kind": "decision", "text": "Siraj back — short or full?", "options": ["Short", "Full", "Mix it", "Around the wicket"], "answerIdx": 2, "splits": { "A": 25, "B": 30, "C": 33, "D": 12 }, "dynamics": "Unpredictability beats one length." }
+      ]
+    },
+    {
+      "afterEvent": 27,
+      "pool": [
+        { "id": "c5a", "kind": "over", "text": "Final phase: chase ends how?", "options": ["Win 6+ balls left", "Win last over", "Lose 1-9 runs", "Lose 10+"], "answerIdx": 1, "splits": { "A": 22, "B": 40, "C": 28, "D": 10 }, "dynamics": "Nerve over power — last-over finish." },
+        { "id": "c5b", "kind": "future", "text": "Player of the chase?", "options": ["Head", "Wade", "Bumrah", "Axar"], "answerIdx": 1, "splits": { "A": 30, "B": 36, "C": 22, "D": 12 }, "dynamics": "Finishers decide chases, not starters." },
+        { "id": "c5c", "kind": "decision", "text": "Last 2 overs, 24 needed — who bowls?", "options": ["Bumrah both", "Split pace/spin", "Siraj death", "Gamble part-timer"], "answerIdx": 0, "splits": { "A": 48, "B": 28, "C": 16, "D": 8 }, "dynamics": "Best bowler bowls the hardest overs. Always." },
+        { "id": "c5d", "kind": "over", "text": "Sixes in last 12 balls?", "options": ["0", "1", "2", "3+"], "answerIdx": 1, "splits": { "A": 28, "B": 44, "C": 20, "D": 8 }, "dynamics": "One clean hit per 12 at the death." }
+      ]
+    }
+  ]
+}

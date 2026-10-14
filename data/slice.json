@@ -1,0 +1,52 @@
+{
+  "target": 155,
+  "current": { "runs": 85, "wkts": 2, "over": "10.2", "ballsLeft": 58, "need": 70, "rrr": 7.24 },
+  "sample": true,
+  "questions": [
+    {
+      "id": "q1",
+      "at": "10.4",
+      "text": "11th over (Chahal to Head): how many runs?",
+      "options": ["0-5", "6-10", "11-15", "16+"],
+      "answerIdx": 1,
+      "splits": { "A": 20, "B": 55, "C": 18, "D": 7 },
+      "dynamics_cached": "Chahal slows it; Head knocks singles. Safe middle wins."
+    },
+    {
+      "id": "q2",
+      "at": "11.2",
+      "text": "Should India review this LBW shout on Maxwell?",
+      "options": ["Review — hitting", "Review — umpire's call", "No review", "Ask keeper first"],
+      "answerIdx": 2,
+      "splits": { "A": 30, "B": 35, "C": 25, "D": 10 },
+      "dynamics_cached": "Impact outside off — review burns. Hold it."
+    },
+    {
+      "id": "q3",
+      "at": "12.0",
+      "text": "12th over (Axar to Head): what happens?",
+      "options": ["0-7 runs", "8-14 runs", "15+ runs", "Wicket"],
+      "answerIdx": 3,
+      "splits": { "A": 12, "B": 64, "C": 8, "D": 16 },
+      "dynamics_cached": "Head holes out going big. Rare wicket call wins the room."
+    },
+    {
+      "id": "q4",
+      "at": "13.1",
+      "text": "If a wicket falls now, who benefits most?",
+      "options": ["Bowling side big", "Bowling side small", "No change", "Batting side"],
+      "answerIdx": 0,
+      "splits": { "A": 45, "B": 30, "C": 15, "D": 10 },
+      "dynamics_cached": "RRR 7.2 → 9.1, pressure 1.0 → 0.85. New batter vs spin struggles."
+    },
+    {
+      "id": "q5",
+      "at": "14.0",
+      "text": "Final call: chase ends how?",
+      "options": ["Win with 6+ balls left", "Win last over", "Lose by 1-9 runs", "Lose by 10+"],
+      "answerIdx": 1,
+      "splits": { "A": 22, "B": 40, "C": 28, "D": 10 },
+      "dynamics_cached": "Nerve over power. Last-over finish most likely."
+    }
+  ]
+}
