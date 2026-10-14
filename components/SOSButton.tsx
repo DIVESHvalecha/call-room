@@ -34,7 +34,7 @@ export default function SOSButton({ context }: { context: string }) {
 
   return (
     <div>
-      <button onClick={sos} className="btn-volt w-full text-base">🚨 WHAT JUST HAPPENED?</button>
+      <button onClick={sos} className="btn-volt w-full text-base">WHAT JUST HAPPENED?</button>
       {open && (
         <div>
           <DynamicsLine

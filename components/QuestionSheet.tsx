@@ -33,7 +33,11 @@ export default function QuestionSheet({
     start.current = Date.now();
     const t = setInterval(() => {
       setLeft((v) => {
-        if (v <= 1) { clearInterval(t); setLocked(true); return 0; }
+        if (v <= 1) {
+          clearInterval(t);
+          setLocked(true);
+          return 0;
+        }
         return v - 1;
       });
     }, 1000);
@@ -42,76 +46,151 @@ export default function QuestionSheet({
 
   const winKey = OPT_KEYS[q.answerIdx];
   const eff = splits ?? q.splits;
+
   function pick(k: OptKey) {
     if (locked) return;
     setPicked(k);
     setLocked(true);
-    try { (navigator as unknown as { vibrate?: (p: number) => void }).vibrate?.(15); } catch { /* noop */ }
+    try {
+      (navigator as unknown as { vibrate?: (p: number) => void }).vibrate?.(15);
+    } catch {
+      /* noop */
+    }
     onResolve(k, Date.now() - start.current);
   }
+
+  const isUrgent = left <= 5;
 
   return (
     <motion.div
       key={q.id}
-      initial={{ rotateX: 70, opacity: 0 }}
-      animate={{ rotateX: 0, opacity: 1 }}
-      transition={{ type: "spring", damping: 22, stiffness: 260 }}
-      style={{ perspective: 800 }}
-      className="panel panel-edge volt"
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="surface overflow-hidden shadow-lg border-[var(--border-medium)]"
     >
-      <svg className="pointer-events-none absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-        <rect x="1" y="1" width="98" height="98" fill="none" stroke={left <= 5 ? "var(--live)" : "var(--volt)"} strokeWidth="1.5"
-          strokeDasharray="400" strokeDashoffset={400 * (1 - left / 15)} style={{ transition: "stroke-dashoffset 1s linear" }} />
-      </svg>
-      <div className="panel-inner">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="tag volt">{kind === "future" ? "FUTURE CALL • SHIMMER" : `CALL INCOMING • OVER ${q.at}`} {left <= 5 ? "• HURRY" : ""} • {source === "ai" ? "AI-AUTHORED ✓" : "POOL"}</p>
-            <h3 className="cond mt-1 text-xl">{q.text}</h3>
+      <div className="p-4 space-y-3.5">
+        {/* Header Strip: Context & Timer */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="font-bold tracking-wider text-[var(--brand-live)] uppercase">
+                {kind === "future" ? "Future Call" : `Over ${q.at} Call`}
+              </span>
+              <span className="text-[var(--text-muted)]">•</span>
+              <span className="text-[var(--text-secondary)]">15s Window</span>
+              {source === "ai" && (
+                <>
+                  <span className="text-[var(--text-muted)]">•</span>
+                  <span className="text-[10px] text-[var(--text-muted)] font-medium">Live AI</span>
+                </>
+              )}
+            </div>
+            {/* Highly readable sentence-case question */}
+            <h3 className="text-base font-semibold text-white leading-snug tracking-normal">
+              {q.text}
+            </h3>
           </div>
-          <div className="flex shrink-0 gap-1">
-            <span className="font-num grid h-11 w-11 place-items-center border text-lg font-bold" style={{ borderColor: left <= 5 ? "var(--live)" : "var(--line)" }}>{left}</span>
-            <button onClick={onClose} aria-label="Dismiss" className="grid h-11 w-11 place-items-center border text-lg" style={{ borderColor: "var(--line)" }}>✕</button>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Timer Badge */}
+            <div
+              className={`font-num grid h-9 w-9 place-items-center rounded-lg text-sm font-bold border transition-colors ${
+                isUrgent
+                  ? "border-[var(--brand-live)] bg-red-950/40 text-[var(--brand-live)]"
+                  : "border-[var(--border-medium)] bg-black/40 text-white"
+              }`}
+            >
+              {left}
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="Dismiss"
+              className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--border-subtle)] bg-white/5 text-sm text-[var(--text-secondary)] hover:text-white transition-colors"
+            >
+              ✕
+            </button>
           </div>
         </div>
-        <div className="mt-3 grid gap-2">
+
+        {/* Prediction Option Cards */}
+        <div className="grid gap-2">
           {OPT_KEYS.map((k, i) => {
             const p = pOf(eff, k);
             const isWin = k === winKey;
             const isMine = k === picked;
             const dim = locked && !isMine && !isWin;
+
             return (
               <motion.button
                 key={k}
-                initial={{ opacity: 0, x: -18 }}
-                animate={{ opacity: dim ? 0.35 : 1, x: 0 }}
-                transition={{ delay: i * 0.06 }}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: dim ? 0.35 : 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
                 onClick={() => pick(k)}
-                whileTap={{ scale: 0.98 }}
-                className="min-h-[56px] px-4 py-3 text-left font-bold text-[var(--text-1)]"
-                style={{
-                  background: locked && isWin ? "rgba(46,230,166,0.22)" : "var(--ink-3)",
-                  border: `1.5px solid ${locked && isWin ? "var(--win)" : "var(--line)"}`,
-                  clipPath: "polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)",
-                  transform: locked && isMine ? "scale(1.02)" : "none",
-                  color: locked && isWin ? "var(--win)" : "var(--text-1)",
-                }}
+                whileTap={{ scale: 0.99 }}
+                className={`relative w-full text-left p-3 rounded-lg border transition-all ${
+                  locked && isWin
+                    ? "bg-emerald-950/20 border-emerald-500/60 text-emerald-200"
+                    : locked && isMine
+                    ? "bg-amber-950/20 border-[var(--brand-gold)] text-[var(--brand-gold)]"
+                    : "bg-[var(--surface-elevated)] border-[var(--border-subtle)] text-white hover:border-[var(--border-medium)]"
+                }`}
               >
-                <span className="mr-2 inline-grid h-6 w-6 place-items-center bg-black/40 text-xs" style={{ color: locked && isWin ? "var(--win)" : "var(--text-1)" }}>{k}</span>
-                {q.options[OPT_KEYS.indexOf(k)]}
-                {isMine && locked && <span className="tag volt ml-2">LOCKED ✓</span>}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className={`grid h-6 w-6 place-items-center rounded font-num text-xs font-bold ${
+                        locked && isWin
+                          ? "bg-emerald-500/20 text-emerald-400"
+                          : locked && isMine
+                          ? "bg-amber-500/20 text-[var(--brand-gold)]"
+                          : "bg-black/40 text-[var(--text-secondary)]"
+                      }`}
+                    >
+                      {k}
+                    </span>
+                    <span className="text-sm font-medium">
+                      {q.options[OPT_KEYS.indexOf(k)]}
+                    </span>
+                  </div>
+
+                  {isMine && locked && (
+                    <span className="text-[10px] font-bold tracking-wider text-[var(--brand-gold)] uppercase">
+                      Locked
+                    </span>
+                  )}
+                </div>
+
+                {/* Percentage distribution bar after locking */}
                 {locked && (
-                  <span className="mt-1 block h-1.5 bg-black/40">
-                    <motion.span initial={{ width: 0 }} animate={{ width: `${p}%` }} transition={{ duration: 0.6 }}
-                      className="block h-full" style={{ background: p <= 20 ? "var(--volt)" : "var(--text-3)" }} />
-                  </span>
+                  <div className="mt-2 pl-8.5">
+                    <div className="h-1 w-full rounded-full bg-black/40 overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${p}%` }}
+                        transition={{ duration: 0.5 }}
+                        className={`h-full rounded-full ${
+                          p <= 20 ? "bg-[var(--brand-gold)]" : "bg-white/20"
+                        }`}
+                      />
+                    </div>
+                    <span className="mt-1 block font-num text-[10px] text-[var(--text-muted)]">
+                      {p}% crowd split {p <= 20 ? "• Rare (+XP)" : ""}
+                    </span>
+                  </div>
                 )}
-                {locked && <span className="mt-1 block text-xs font-normal" style={{ color: "var(--text-2)" }}>{p}%{p <= 20 ? " • RARE" : ""}{isMine ? " • YOU" : ""}</span>}
               </motion.button>
             );
           })}
         </div>
-        <p className="mt-2 text-xs" style={{ color: "var(--text-2)" }}>{locked ? q.dynamics_cached : "Max 1 per over • key moments + future calls when quiet."}</p>
+
+        {/* Footer Note */}
+        <p className="text-[11px] text-[var(--text-muted)]">
+          {locked
+            ? q.dynamics_cached || "Settles automatically upon completion of the over."
+            : "Select one call before the over begins. Rare calls earn bonus XP."}
+        </p>
       </div>
     </motion.div>
   );

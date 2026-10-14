@@ -30,8 +30,8 @@ export type FlatBall = {
   teamWkts: number;
 };
 
-export type BatterRow = { name: string; runs: number; balls: number; fours: number; sixes: number; out: string | null };
-export type BowlerRow = { name: string; balls: number; runs: number; wkts: number };
+export type BatterRow = { name: string; runs: number; balls: number; fours: number; sixes: number; out: string | null; isStriker?: boolean };
+export type BowlerRow = { name: string; balls: number; runs: number; wkts: number; maidens?: number };
 
 function isLegal(d: RawDelivery): boolean {
   const ex = d.extras ?? {};
@@ -116,10 +116,13 @@ export function tableAt(balls: FlatBall[], upto: number): {
   extras: number;
   lastBalls: string[];
   fow: { score: string; player: string }[];
+  striker?: string;
+  currentBowler?: string;
 } {
   const slice = balls.slice(0, Math.max(0, Math.min(upto, balls.length)));
   const bat = new Map<string, { runs: number; balls: number; fours: number; sixes: number; out: string | null }>();
   const bowl = new Map<string, { balls: number; runs: number; wkts: number }>();
+  const bowlerOverRuns = new Map<string, Map<number, { balls: number; runs: number }>>();
   const order: string[] = [];
   let extras = 0;
   const fow: { score: string; player: string }[] = [];
@@ -133,6 +136,7 @@ export function tableAt(balls: FlatBall[], upto: number): {
     }
     const bs = bat.get(b.batter)!;
     const isWide = b.extraKind === "wides";
+    const isNb = b.extraKind === "noballs";
     if (!isWide) {
       bs.balls += 1;
       bs.runs += b.batterRuns;
@@ -148,7 +152,6 @@ export function tableAt(balls: FlatBall[], upto: number): {
     extras += b.extras;
     if (!bowl.has(b.bowler)) bowl.set(b.bowler, { balls: 0, runs: 0, wkts: 0 });
     const bw = bowl.get(b.bowler)!;
-    const isNb = b.extraKind === "noballs";
     if (!isWide && !isNb) bw.balls += 1;
     bw.runs += b.runs;
     if (b.wicket && b.wicket.player_out) {
@@ -157,21 +160,44 @@ export function tableAt(balls: FlatBall[], upto: number): {
     }
     if (b.wicket) fow.push({ score: `${b.teamRuns}/${b.teamWkts}`, player: b.wicket.player_out });
     lastOver = b.over;
+
+    // track bowler over breakdown for maidens
+    if (!bowlerOverRuns.has(b.bowler)) bowlerOverRuns.set(b.bowler, new Map());
+    const boMap = bowlerOverRuns.get(b.bowler)!;
+    if (!boMap.has(b.over)) boMap.set(b.over, { balls: 0, runs: 0 });
+    const overStat = boMap.get(b.over)!;
+    if (!isWide && !isNb) overStat.balls += 1;
+    overStat.runs += b.runs;
+
     const sym = b.wicket ? "W" : b.extras > 0 && b.batterRuns === 0 ? (b.extraKind === "wides" ? "wd" : "+") : String(b.runs);
     lastBalls.push(sym);
   }
 
   const last = slice[slice.length - 1];
   const oversLabel = last ? last.actual : "0.0";
+  const striker = last ? last.batter : undefined;
+  const currentBowler = last ? last.bowler : undefined;
   void lastOver;
 
-  const batters: BatterRow[] = order.map((name) => ({ name, ...bat.get(name)! }));
+  const batters: BatterRow[] = order.map((name) => {
+    const s = bat.get(name)!;
+    return { name, ...s, isStriker: name === striker && !s.out };
+  });
   // crease order: not-out batters first (last two), then rest by runs
   const notOut = batters.filter((b) => !b.out);
   const out = batters.filter((b) => b.out);
   const ordered = [...notOut.slice(-2), ...out.reverse(), ...notOut.slice(0, -2)];
 
-  const bowlers: BowlerRow[] = Array.from(bowl.entries()).map(([name, s]) => ({ name, ...s }));
+  const bowlers: BowlerRow[] = Array.from(bowl.entries()).map(([name, s]) => {
+    let maidens = 0;
+    const boMap = bowlerOverRuns.get(name);
+    if (boMap) {
+      boMap.forEach((st) => {
+        if (st.balls === 6 && st.runs === 0) maidens += 1;
+      });
+    }
+    return { name, ...s, maidens };
+  });
 
   const head = slice[slice.length - 1];
   return {
@@ -183,6 +209,8 @@ export function tableAt(balls: FlatBall[], upto: number): {
     extras,
     lastBalls: lastBalls.slice(-12),
     fow,
+    striker,
+    currentBowler,
   };
 }
 

@@ -23,22 +23,29 @@ export default function Leaderboard({
   youRank?: number;
   gapPts?: number;
   tied?: boolean;
+  onEnter?: () => void;
 }) {
   return (
-    <div className="paper p-0">
-      <div className="flex items-center justify-between px-4 py-2" style={{ background: "var(--ink-2)" }}>
-        <span className="cond text-sm" style={{ color: "var(--text-1)" }}>TOP CALLERS • LIVE 500</span>
+    <div className="surface overflow-hidden">
+      {/* Table Header */}
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[var(--border-subtle)] bg-[var(--surface-elevated)]">
+        <span className="text-xs font-bold text-white tracking-wider uppercase">
+          Room Standings
+        </span>
         {typeof youRank === "number" ? (
-          <span className="tag volt">
-            YOU #{youRank}
-            {typeof gapPts === "number" && gapPts > 0 ? ` • ${gapPts} PTS TO NEXT` : " • LEADING"}
+          <span className="text-xs font-semibold text-[var(--brand-gold)] font-num">
+            Your Rank: #{youRank}
+            {typeof gapPts === "number" && gapPts > 0 ? ` (${gapPts} XP to next)` : " (Leading)"}
           </span>
         ) : (
-          <span className="tag volt">JOIN TO CLIMB</span>
+          <span className="text-xs text-[var(--text-muted)] font-medium">
+            Live 500 Room
+          </span>
         )}
       </div>
 
-      <div className="space-y-1 p-3">
+      {/* Rows List */}
+      <div className="divide-y divide-[var(--border-subtle)]">
         {rows.map((r, i) => {
           const displayRank = tied ? 1 : (r.rank ?? i + 1);
           const prevRow = i > 0 ? rows[i - 1] : null;
@@ -51,42 +58,66 @@ export default function Leaderboard({
           const gapCount = hasGap ? (r.rank! - prevRow!.rank! - 1) : 0;
 
           return (
-            <div key={r.name} className="space-y-1">
+            <div key={r.name}>
               {hasGap && (
-                <div className="py-1 text-center text-[10px] font-bold text-gray-500 tracking-wider">
-                  ••• {gapCount} OTHER CALLERS •••
+                <div className="py-1.5 px-3.5 bg-black/20 text-center font-num text-[10px] text-[var(--text-muted)] tracking-wider">
+                  ••• {gapCount} callers in between •••
                 </div>
               )}
               <motion.div
                 layout
                 transition={{ type: "spring", damping: 30, stiffness: 350 }}
-                className="flex items-center justify-between px-3 py-2 text-sm font-bold"
-                style={{
-                  background: r.you ? "var(--volt)" : "#fff",
-                  color: "#10173a",
-                  borderLeft: r.you ? "6px solid var(--electric)" : "6px solid transparent",
-                  clipPath: "polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)",
-                }}
+                className={`flex items-center justify-between px-3.5 py-2 text-xs transition-colors ${
+                  r.you
+                    ? "bg-amber-500/10 text-[var(--brand-gold)] font-semibold"
+                    : "text-[var(--text-primary)] hover:bg-white/[0.02]"
+                }`}
               >
-                <span>
-                  #{displayRank} {r.name}
-                  {r.you ? " ★ YOU" : " "}
-                </span>
-                <span>
-                  <AnimatedNumber value={r.pts} />
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`font-num w-6 font-bold ${
+                      displayRank <= 3 && !tied
+                        ? "text-[var(--brand-gold)]"
+                        : r.you
+                        ? "text-[var(--brand-gold)]"
+                        : "text-[var(--text-muted)]"
+                    }`}
+                  >
+                    #{displayRank}
+                  </span>
+                  <span className="font-medium text-sm">
+                    {r.name}
+                    {r.you && (
+                      <span className="ml-1.5 text-[10px] font-bold text-[var(--brand-gold)] tracking-wide uppercase">
+                        (You)
+                      </span>
+                    )}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-num text-sm font-semibold">
+                    <AnimatedNumber value={r.pts} />
+                    <span className="text-[10px] text-[var(--text-muted)] font-normal ml-1">XP</span>
+                  </span>
                   {typeof r.delta === "number" && r.delta !== 0 && (
-                    <span className="ml-2 text-xs">
-                      {r.delta > 0 ? `▲${r.delta}` : `▼${-r.delta}`}
+                    <span className={`font-num text-[10px] font-bold ${r.delta > 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {r.delta > 0 ? `+${r.delta}` : `${r.delta}`}
                     </span>
                   )}
-                </span>
+                </div>
               </motion.div>
             </div>
           );
         })}
       </div>
 
-      <p className="px-4 pb-3 text-[11px] font-bold">+{others} OTHERS (LIVE CROWD)</p>
+      {/* Table Footer */}
+      <div className="px-3.5 py-2 border-t border-[var(--border-subtle)] bg-[var(--surface-elevated)]/50 text-center">
+        <p className="font-num text-[10px] text-[var(--text-muted)]">
+          +{others} other participants in this session
+        </p>
+      </div>
     </div>
   );
 }

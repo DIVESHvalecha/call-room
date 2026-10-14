@@ -56,7 +56,7 @@ export default function DynamicsLine({
       className="panel panel-edge volt mt-2"
     >
       <div className="panel-inner">
-        <p className="cond text-base leading-tight">🗞 {line}</p>
+        <p className="cond text-base leading-tight">{line}</p>
         <p className="mt-1 text-[10px]" style={{ color: "var(--text-2)" }}>
           {badge ? `${badge} • ` : "LIVE AI • "}from {vaultId} • situational sealed regardless
         </p>

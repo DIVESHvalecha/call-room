@@ -35,7 +35,7 @@ export default function MatchList({ onEnter, liveScore }: { onEnter: (id: string
       ))}
       <div className="panel panel-edge volt">
         <div className="panel-inner flex items-center justify-between">
-          <div><p className="cond">🔥 DAILY TRIVIA STREAK RIBBON</p>
+          <div><p className="cond">DAILY TRIVIA STREAK RIBBON</p>
           <p className="text-xs" style={{ color: "var(--text-2)" }}>● ● ○ • +30 XP </p></div>
           <span className="tag volt">+30 XP</span>
         </div>

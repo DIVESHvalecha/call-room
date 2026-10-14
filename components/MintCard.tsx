@@ -86,6 +86,7 @@ export default function MintCard({
   reward,
   dailyRank = 7,
   best,
+  onViewAlbum,
 }: {
   live?: number;
   situational?: number;
@@ -100,6 +101,7 @@ export default function MintCard({
   reward?: string;
   dailyRank?: number;
   best?: { qText: string; yourPick: string; correctPick: string; pts: number; p: number; over: string; verdict: string };
+  onViewAlbum?: () => void;
 }) {
   const total = live + situational;
   const max = 140;
@@ -151,13 +153,13 @@ export default function MintCard({
           }}
           className="relative rounded-2xl p-[3px] transition-shadow duration-300"
         >
-          {/* Card Inner Navy Container */}
+          {/* Card Inner Grounded Container */}
           <div
-            className="relative overflow-hidden rounded-[13px] bg-[#0a0f2c] p-4 text-center sm:p-5"
+            className="relative overflow-hidden rounded-[13px] bg-[#0c101a] p-4 text-center sm:p-5"
             style={{
               backgroundImage: `
                 radial-gradient(ellipse 350px 220px at 50% 0%, ${activeTheme.accentBg}, transparent 70%),
-                linear-gradient(180deg, #101844 0%, #0a0f2c 60%, #06091e 100%)
+                linear-gradient(180deg, #131926 0%, #0c101a 60%, #070a10 100%)
               `,
             }}
           >
@@ -172,7 +174,7 @@ export default function MintCard({
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
                 <span className="cond text-[11px] font-bold tracking-widest text-white/80">
-                  LIVE MINT #042/500
+                  MATCH EDITION #042/500
                 </span>
               </div>
               <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-[var(--volt)]">
@@ -206,7 +208,7 @@ export default function MintCard({
                     </span>
                   </div>
                   <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-[11px] font-extrabold text-emerald-400">
-                    +{best.pts} PTS
+                    +{best.pts} XP
                   </span>
                 </div>
 
@@ -254,7 +256,7 @@ export default function MintCard({
 
               {/* Score Composition Equation */}
               <div className="mt-2.5 border-t border-white/10 pt-2 text-[11px] font-medium text-white/70">
-                Live <b className="text-white"><AnimatedNumber value={a} /></b> + Situational <b className="text-white"><AnimatedNumber value={b} /></b> = Total <b className="text-[var(--volt)] font-bold text-sm"><AnimatedNumber value={c} /> PTS</b>
+                Live <b className="text-white"><AnimatedNumber value={a} /></b> + Situational <b className="text-white"><AnimatedNumber value={b} /></b> = Total <b className="text-[var(--volt)] font-bold text-sm"><AnimatedNumber value={c} /> XP</b>
               </div>
             </div>
 
@@ -275,7 +277,7 @@ export default function MintCard({
 
               {reward && (
                 <span className="rounded-full bg-emerald-400 px-3 py-1 text-xs font-bold text-[#06281c] shadow">
-                  🎁 {reward}
+                  {reward}
                 </span>
               )}
             </div>
@@ -287,8 +289,7 @@ export default function MintCard({
                 transition={{ delay: 1.2 }}
                 className="relative z-20 mx-auto mt-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[11px] font-bold text-emerald-300"
               >
-                <span>⚡</span>
-                <span>DAILY BONUS BOOSTED: {rankTier.toUpperCase()} → {finalTier.toUpperCase()}</span>
+                <span>DAILY BONUS TIER: {rankTier.toUpperCase()} → {finalTier.toUpperCase()}</span>
               </motion.div>
             )}
 
@@ -348,21 +349,31 @@ export default function MintCard({
             const ok = await shareCardPNG(el as HTMLElement);
             setShared(ok ? "Card saved / shared ✓" : "Share failed — screenshot instead");
           }}
-          className="btn-volt flex items-center justify-center gap-1.5 shadow-lg"
+          className="btn-gold shadow-md"
         >
-          <span>📸</span>
-          <span>SHARE CARD</span>
+          <span>Share Card</span>
         </motion.button>
         <motion.button
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.4 }}
           onClick={async () => setShared((await copyChallengeLink()) ? "Challenge link copied ✓" : "Copy failed")}
-          className="panel panel-edge flex items-center justify-center gap-1.5 min-h-[56px] cond text-base font-bold text-white hover:border-[var(--volt)]"
+          className="btn-secondary"
         >
-          <span>⚔️</span>
-          <span>CHALLENGE A FRIEND</span>
+          <span>Challenge Friend</span>
         </motion.button>
+
+        {onViewAlbum && (
+          <motion.button
+            initial={{ y: 16, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            onClick={onViewAlbum}
+            className="btn-primary col-span-2 py-2.5 text-center justify-center font-bold text-xs uppercase tracking-wider"
+          >
+            <span>View in Trophy Album →</span>
+          </motion.button>
+        )}
       </div>
 
       {shared && (

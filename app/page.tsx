@@ -11,15 +11,15 @@ import AlbumGrid from "@/components/AlbumGrid";
 import SeasonTable from "@/components/SeasonTable";
 import DailyList from "@/components/DailyList";
 import MockMapModal from "@/components/MockMapModal";
-import MatchList from "@/components/MatchList";
+import HomeScreen from "@/components/HomeScreen";
+import MobileNav from "@/components/MobileNav";
 import Reactions from "@/components/Reactions";
 import ScratchReveal from "@/components/ScratchReveal";
 import FlyingPoints from "@/components/FlyingPoints";
 import AnimatedNumber from "@/components/AnimatedNumber";
-import FullScoreboard from "@/components/FullScoreboard";
 import FinalBoard from "@/components/FinalBoard";
 import FastForward from "@/components/FastForward";
-import { addMatchXP, unlockSlot, loadStore } from "@/lib/store";
+import { addMatchXP, unlockSlot, loadStore, addCollectedCard } from "@/lib/store";
 import OnAirLight from "@/components/OnAirLight";
 import WipeTransition from "@/components/WipeTransition";
 import { useHype } from "@/hooks/useHype";
@@ -89,6 +89,7 @@ export default function Page() {
   const [myPts, setMyPts] = useState(0);
   const [sitPts, setSitPts] = useState(0);
   const [correct, setCorrect] = useState(0);
+  const [streak, setStreak] = useState(0);
   const [answered, setAnswered] = useState(0);
   const [impSum, setImpSum] = useState(0);
   const [pendings, setPendings] = useState<PendingCall[]>([]);
@@ -580,7 +581,12 @@ export default function Page() {
     }
     const winKey = OPT_KEYS[curQ.answerIdx];
     const ok = key === winKey;
-    if (ok) setCorrect((v) => v + 1);
+    if (ok) {
+      setCorrect((v) => v + 1);
+      setStreak((s) => s + 1);
+    } else {
+      setStreak(0);
+    }
     const p = pOf(splits, winKey);
     const pts = ok ? totalPoints(p, ms) : 0;
     setPrevRank(liveRank);
@@ -610,6 +616,9 @@ export default function Page() {
         if (r.ok) {
           hits += 1;
           setCorrect((v) => v + 1);
+          setStreak((s) => s + 1);
+        } else {
+          setStreak(0);
         }
         if (i === 0 || !firstLabel) {
           firstLabel = r.correctLabel;
@@ -678,9 +687,39 @@ export default function Page() {
         setMyPts((v) => v + gain);
         addMatchXP(myPts + gain);
       }
-      unlockSlot("head-falls");
+      unlockSlot("live-match");
       return [];
     });
+
+    // Add revealed card to Trophy Album
+    addCollectedCard({
+      id: `card-ind-wi-${Date.now()}`,
+      slotId: "live-match",
+      matchTitle: isChase ? "INDIA v WEST INDIES" : "WEST INDIES v INDIA",
+      matchEdition: isChase ? "CHASE 406 • EDEN GARDENS" : "1ST INNINGS • EDEN GARDENS",
+      tier: (rar.tier as "Diamond" | "Platinum" | "Gold" | "Silver") || "Gold",
+      rarityScore: rar.score,
+      xp: myPts,
+      liveXP: myPts - sitPts,
+      situationalXP: sitPts,
+      streak: streak || 4,
+      matchRank: liveRank,
+      dailyRank: daily.youRank,
+      bestCall: best && best.pts >= 20 ? "RARE INSIGHT READ" : "CLUTCH MOMENT READ",
+      reward: rar.reward,
+      best: best ?? {
+        qText: "Can India chase down 406 at Eden Gardens?",
+        yourPick: "Over boundary on ball 6",
+        correctPick: "Over boundary on ball 6",
+        pts: 25,
+        p: 22,
+        over: table.oversLabel || "11.3",
+        verdict: "correct +25",
+      },
+      unlockedAt: "Just now",
+      isNew: true,
+    });
+
     setRevealed(true);
     setStep("mint");
   }
@@ -692,7 +731,7 @@ export default function Page() {
     liveSize: 500,
     dailyRank: daily.youRank,
     dailySize: 132,
-    streak: 4,
+    streak: streak || 4,
   });
 
   useHype(step === "contest" ? 0.75 : 0.35);
@@ -707,25 +746,83 @@ export default function Page() {
       }
     : null;
 
+  const currentTab = step === "lobby" || step === "preview" ? "home" : step === "contest" ? "live" : step === "album" || step === "mint" ? "album" : "daily";
+
+  const handleSelectTab = (tab: "home" | "live" | "album" | "daily") => {
+    if (tab === "home") setStep("lobby");
+    else if (tab === "live") {
+      setMatch("m1");
+      setStep("contest");
+    } else if (tab === "album") setStep("album");
+    else if (tab === "daily") setStep("daily");
+  };
+
+  const battersMapped = useMemo(() => table.batters.map((b) => ({
+    name: b.name,
+    runs: b.runs,
+    balls: b.balls,
+    fours: b.fours,
+    sixes: b.sixes,
+    sr: ((b.runs / Math.max(1, b.balls)) * 100).toFixed(1),
+    out: b.out,
+    isStriker: b.isStriker,
+  })), [table.batters]);
+
+  const bowlersMapped = useMemo(() => table.bowlers.map((b) => ({
+    name: b.name,
+    overs: `${Math.floor(b.balls / 6)}.${b.balls % 6}`,
+    maidens: b.maidens ?? 0,
+    runs: b.runs,
+    wkts: b.wkts,
+    econ: b.balls > 0 ? ((b.runs / b.balls) * 6).toFixed(1) : "0.0",
+  })), [table.bowlers]);
+
   return (
-    <main className="pb-40">
+    <main>
       <WipeTransition k={step} />
       <FlyingPoints flight={flying} />
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="cond text-3xl">CALL ROOM</h1>
-        <OnAirLight on={step === "contest"} />
-      </div>
+
+      {/* Header with Exit to Home when inside sub-screens */}
+      {step !== "lobby" && (
+        <div className="mb-3.5 flex items-center justify-between">
+          <button
+            onClick={() => setStep("lobby")}
+            className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-[var(--ink-2)] px-3 py-1.5 text-xs font-bold cond text-[var(--text-2)] hover:text-white active:scale-95 transition-all shadow-sm"
+          >
+            <span>←</span>
+            <span>HOME</span>
+          </button>
+          <span className="cond text-sm font-bold tracking-wider text-white">
+            {step === "contest" ? "LIVE CALL ROOM" : step.toUpperCase()}
+          </span>
+          <OnAirLight on={step === "contest"} />
+        </div>
+      )}
 
       {step === "lobby" && (
-        <section>
-          <div className="mt-2">
-            <MatchList
-              onEnter={(id) => { setMatch(id); setStep("preview"); }}
-              liveScore={{ runs: score.runs, wkts: score.wkts, over: score.over, need: score.need, ballsLeft: score.ballsLeft }}
-            />
-          </div>
-          <button onClick={() => setStep("daily")} className="panel panel-edge volt mt-3 w-full min-h-[52px] font-bold cond text-lg">DAILY TRIVIA →</button>
-        </section>
+        <HomeScreen
+          onEnterLive={() => {
+            setMatch("m1");
+            setQi(0);
+            setAskedOvers([]);
+            setCurQ(null);
+            setShowQ(false);
+            setStep("contest");
+          }}
+          onViewAlbum={() => setStep("album")}
+          onViewDaily={() => setStep("daily")}
+          liveScore={{
+            runs: score.runs,
+            wkts: score.wkts,
+            over: score.over,
+            need: score.need,
+            ballsLeft: score.ballsLeft,
+            target: score.target,
+          }}
+          userXP={1250 + dailyEarned + myPts}
+          userRank={liveRank}
+          unlockedCount={loadStore().cards.length}
+        />
       )}
 
       {(step === "preview" || step === "contest") && (
@@ -771,22 +868,22 @@ export default function Page() {
             score={{ ...score, over: table.oversLabel }}
             balls={lastBalls}
             isChase={isChase}
-            inningsTotal={300}
-            matchTitle={isChase ? "IND v WI • CHASE 406" : "WI v IND • 1ST INNINGS"}
-            batters={table.batters.map((b) => ({ name: b.name, runs: b.runs, balls: b.balls, sr: ((b.runs / Math.max(1, b.balls)) * 100).toFixed(1) }))}
-            bowlers={table.bowlers.map((b) => ({ name: b.name, overs: `${Math.floor(b.balls / 6)}.${b.balls % 6}`, runs: b.runs, wkts: b.wkts }))}
+            battingTeam={isChase ? "India" : "West Indies"}
+            bowlingTeam={isChase ? "West Indies" : "India"}
+            format="2nd ODI • 50 ov"
+            venue="Barsapara Cricket Stadium, Guwahati"
+            matchTitle={isChase ? "India vs West Indies • Chase 406" : "West Indies vs India • 1st Innings"}
+            batters={battersMapped}
+            bowlers={bowlersMapped}
           />
-          <FullScoreboard team={inns[innIdx]?.team ?? ""} runs={table.runs} wkts={table.wkts} oversLabel={table.oversLabel} oversTotal={50}
-            batters={table.batters} bowlers={table.bowlers} extras={table.extras}
-            crr={(table.runs / Math.max(0.1, liveCursor / 6)).toFixed(2)} />
           <Reactions scoreLine={scoreLine} team={inns[innIdx]?.team ?? ""} batter={table.batters.find((b) => !b.out)?.name ?? ""} bowler={table.bowlers[table.bowlers.length - 1]?.name ?? ""} isChase={isChase} liveBall={liveBall} />
           <Leaderboard rows={rows} others={490} youRank={liveRank} gapPts={gapToNext} />
           <button
-            onClick={() => { setQi(0); setMyPts(0); setSitPts(0); setCorrect(0); setAnswered(0); setImpSum(0); setPrevRank(null); setPendings([]); setBest(null); setRevealed(false); setAskedOvers([]); setCurQ(null); setShowQ(false); setStep("contest"); }}
-            className="btn-volt w-full text-lg">
-            ENTER LIVE QUIZ »
+            onClick={() => { setQi(0); setMyPts(0); setSitPts(0); setCorrect(0); setStreak(0); setAnswered(0); setImpSum(0); setPrevRank(null); setPendings([]); setBest(null); setRevealed(false); setAskedOvers([]); setCurQ(null); setShowQ(false); setStep("contest"); }}
+            className="btn-primary">
+            Enter Live Call Room →
           </button>
-          <button onClick={() => setStep("lobby")} className="w-full min-h-[48px] text-sm" style={{ color: "var(--text-2)" }}>← ALL MATCHES</button>
+          <button onClick={() => setStep("lobby")} className="btn-secondary">← Back to Matches</button>
         </section>
       )}
 
@@ -796,65 +893,73 @@ export default function Page() {
             score={{ ...score, over: table.oversLabel }}
             balls={lastBalls}
             isChase={isChase}
-            inningsTotal={300}
-            matchTitle={isChase ? "IND v WI • CHASE 406" : "WI v IND • 1ST INNINGS"}
-            batters={table.batters.map((b) => ({ name: b.name, runs: b.runs, balls: b.balls, sr: ((b.runs / Math.max(1, b.balls)) * 100).toFixed(1) }))}
-            bowlers={table.bowlers.map((b) => ({ name: b.name, overs: `${Math.floor(b.balls / 6)}.${b.balls % 6}`, runs: b.runs, wkts: b.wkts }))}
+            battingTeam={isChase ? "India" : "West Indies"}
+            bowlingTeam={isChase ? "West Indies" : "India"}
+            format="2nd ODI • 50 ov"
+            venue="Barsapara Cricket Stadium, Guwahati"
+            matchTitle={isChase ? "India vs West Indies • Chase 406" : "West Indies vs India • 1st Innings"}
+            batters={battersMapped}
+            bowlers={bowlersMapped}
           />
           {ff && (
             <FastForward from={ff.from} to={ff.to} balls={ff.syms} onBall={onFfBall} onDone={ffDone} />
           )}
           {!ff && incoming && !showQ && (
-            <div className="panel panel-edge volt">
-              <div className="panel-inner flex items-center gap-2">
-                <span className="tag volt animate-pop">CALL INCOMING</span>
-                <span className="text-xs" style={{ color: "var(--text-2)" }}>reading the match…</span>
-              </div>
+            <div className="surface p-3 flex items-center gap-2 border-[var(--border-accent)]">
+              <span className="h-2 w-2 rounded-full bg-[var(--brand-gold)] animate-pulse" />
+              <span className="text-xs font-bold text-white uppercase tracking-wider">Over Call Incoming</span>
+              <span className="text-xs text-[var(--text-secondary)]">• Analyzing match dynamics</span>
             </div>
           )}
           {!ff && showQ && curQ && (
             <QuestionSheet key={curQ.id} q={{ ...curQ, text: curQ.filledText } as unknown as never} kind={curQ.kind} splits={splits} onResolve={resolve} onClose={skipQ} source={curQ.source} />
           )}
           {!ff && !showQ && (
-            <div className="panel panel-edge">
-              <div className="panel-inner flex items-center justify-between gap-2">
-                <span className="text-sm" style={{ color: "var(--text-2)" }}>CALLS: <b style={{ color: "var(--volt)" }}>{answered}</b> • TOTAL <b style={{ color: "var(--text-1)" }}><AnimatedNumber value={myPts} /></b> PTS</span>
-                <div className="flex gap-2">
-                  <button onClick={ffToNextCall} className="tag volt">⏩ NEXT OVER</button>
-                  {answered >= 1 && (
-                    <button onClick={() => setStep("reveal")} className="tag live font-bold animate-pulse">REVEAL CARD »</button>
-                  )}
-                </div>
+            <div className="surface p-3 flex items-center justify-between gap-3">
+              <div className="text-xs">
+                <span className="text-[var(--text-secondary)]">Calls: <b className="text-white font-num font-bold">{answered}</b></span>
+                <span className="mx-1.5 text-[var(--text-muted)]">•</span>
+                <span className="text-[var(--text-secondary)]">Streak: <b className="text-[var(--brand-gold)] font-num font-bold">{streak}</b></span>
+                <span className="mx-1.5 text-[var(--text-muted)]">•</span>
+                <span className="text-[var(--text-secondary)]">Total: <b className="text-[var(--brand-gold)] font-num font-bold"><AnimatedNumber value={myPts} /></b> XP</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={ffToNextCall} className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-[var(--border-subtle)] text-xs font-semibold text-white hover:bg-white/10 transition-colors">
+                  Next Over →
+                </button>
+                {answered >= 1 && (
+                  <button onClick={() => setStep("reveal")} className="px-2.5 py-1.5 rounded-lg bg-[var(--brand-gold)] text-black text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-colors">
+                    Finish & reveal card
+                  </button>
+                )}
               </div>
             </div>
           )}
           <ResolveFlash flash={flash} />
-          {answered >= 1 && (
-            <div className="panel panel-edge volt">
-              <div className="panel-inner flex items-center justify-between gap-2">
-                <div>
-                  <span className="cond text-base font-bold text-[var(--volt)]">CASH OUT & MINT CARD</span>
-                  <p className="text-[11px]" style={{ color: "var(--text-2)" }}>
-                    {answered} calls answered • {myPts} PTS • Live #{liveRank}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setStep("reveal")}
-                  className="btn-volt px-3 py-1.5 text-xs font-bold uppercase tracking-wider"
-                >
-                  REVEAL & MINT CARD »
-                </button>
+          {answered >= 1 && showQ && (
+            <div className="surface p-3 flex items-center justify-between gap-3 border-[var(--border-accent)]">
+              <div>
+                <span className="text-xs font-bold text-[var(--brand-gold)] uppercase tracking-wider">Session Progress</span>
+                <p className="text-[11px] text-[var(--text-secondary)]">
+                  {answered} calls • Streak: {streak} • {myPts} XP • Rank #{liveRank}
+                </p>
               </div>
+              <button
+                onClick={() => setStep("reveal")}
+                className="px-3 py-1.5 rounded-lg bg-[var(--brand-gold)] text-black text-xs font-bold uppercase tracking-wider hover:brightness-110"
+              >
+                Finish & reveal card →
+              </button>
             </div>
           )}
           <Leaderboard rows={rows} others={490} youRank={liveRank} gapPts={gapToNext} />
           <div className="panel panel-edge win">
-            <div className="panel-inner text-xs">🔒 PREDICTIONS SETTLE ONLY WHEN THE BALLS EXIST • never before the over ends</div>
+            <div className="panel-inner text-xs">PREDICTIONS SETTLE ONLY WHEN THE BALLS EXIST • never before the over ends</div>
           </div>
           {pendings.length > 0 && (
             <div className="panel panel-edge">
               <div className="panel-inner">
-                <span className="tag">⏳ {pendings.length} CALL{pendings.length > 1 ? "S" : ""} WAITING</span>
+                <span className="tag">{pendings.length} CALL{pendings.length > 1 ? "S" : ""} WAITING</span>
                 <div className="mt-2 space-y-1">
                   {pendings.map((pc) => (
                     <p key={pc.q.id} className="text-xs" style={{ color: "var(--text-2)" }}>
@@ -875,40 +980,33 @@ export default function Page() {
             score={{ ...score, over: table.oversLabel }}
             balls={lastBalls}
             isChase={isChase}
-            inningsTotal={300}
-            matchTitle={isChase ? "IND v WI • CHASE 406" : "WI v IND • 1ST INNINGS"}
-            batters={table.batters.map((b) => ({ name: b.name, runs: b.runs, balls: b.balls, sr: ((b.runs / Math.max(1, b.balls)) * 100).toFixed(1) }))}
-            bowlers={table.bowlers.map((b) => ({ name: b.name, overs: `${Math.floor(b.balls / 6)}.${b.balls % 6}`, runs: b.runs, wkts: b.wkts }))}
+            battingTeam={isChase ? "India" : "West Indies"}
+            bowlingTeam={isChase ? "West Indies" : "India"}
+            format="2nd ODI • 50 ov"
+            venue="Barsapara Cricket Stadium, Guwahati"
+            matchTitle={isChase ? "India vs West Indies • Chase 406" : "West Indies vs India • 1st Innings"}
+            batters={battersMapped}
+            bowlers={bowlersMapped}
           />
-          <div className="panel panel-edge">
-            <div className="panel-inner flex items-center justify-between gap-2">
-              <span className="text-sm" style={{ color: "var(--text-2)" }}>CALLS: <b style={{ color: "var(--volt)" }}>{answered}</b> • TOTAL <b style={{ color: "var(--text-1)" }}><AnimatedNumber value={myPts} /></b> PTS</span>
-              <div className="flex gap-2">
-                <button onClick={ffToNextCall} className="tag volt">⏩ NEXT OVER</button>
-                {answered >= 1 && (
-                  <button onClick={() => setStep("reveal")} className="tag live font-bold animate-pulse">REVEAL CARD »</button>
-                )}
-              </div>
+          <div className="surface p-3 flex items-center justify-between gap-3">
+            <div className="text-xs">
+              <span className="text-[var(--text-secondary)]">Calls: <b className="text-white font-num font-bold">{answered}</b></span>
+              <span className="mx-1.5 text-[var(--text-muted)]">•</span>
+              <span className="text-[var(--text-secondary)]">Streak: <b className="text-[var(--brand-gold)] font-num font-bold">{streak}</b></span>
+              <span className="mx-1.5 text-[var(--text-muted)]">•</span>
+              <span className="text-[var(--text-secondary)]">Total: <b className="text-[var(--brand-gold)] font-num font-bold"><AnimatedNumber value={myPts} /></b> XP</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={ffToNextCall} className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-[var(--border-subtle)] text-xs font-semibold text-white hover:bg-white/10 transition-colors">
+                Next Over →
+              </button>
+              {answered >= 1 && (
+                <button onClick={() => setStep("reveal")} className="px-2.5 py-1.5 rounded-lg bg-[var(--brand-gold)] text-black text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-colors">
+                  Finish & reveal card
+                </button>
+              )}
             </div>
           </div>
-          {answered >= 1 && (
-            <div className="panel panel-edge volt">
-              <div className="panel-inner flex items-center justify-between gap-2">
-                <div>
-                  <span className="cond text-base font-bold text-[var(--volt)]">CASH OUT & MINT CARD</span>
-                  <p className="text-[11px]" style={{ color: "var(--text-2)" }}>
-                    {answered} calls answered • {myPts} PTS • Live #{liveRank}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setStep("reveal")}
-                  className="btn-volt px-3 py-1.5 text-xs font-bold uppercase tracking-wider"
-                >
-                  REVEAL & MINT CARD »
-                </button>
-              </div>
-            </div>
-          )}
           <Leaderboard rows={rows} others={490} youRank={liveRank} gapPts={gapToNext} />
         </section>
       )}
@@ -931,12 +1029,13 @@ export default function Page() {
             matchRank={liveRank}
             bestCall={best && best.pts >= 20 ? "RARE INSIGHT READ" : "CLUTCH MOMENT READ"}
             seasonPct={Math.round((daily.youRank / 132) * 100)}
-            streak={4}
+            streak={streak || 4}
             rarityScore={rar.score}
             rarityTier={rar.tier}
             reward={rar.reward}
             dailyRank={daily.youRank}
             best={best ?? undefined}
+            onViewAlbum={() => setStep("album")}
           />
           <FinalBoard rows={rows} youRank={liveRank} />
         </section>
@@ -945,38 +1044,62 @@ export default function Page() {
         <section className="space-y-3">
           <AlbumGrid />
           <SeasonTable matchPts={myPts} />
-          <button onClick={() => setStep("daily")} className="panel panel-edge w-full min-h-[52px] font-bold cond text-lg">DAILY QUIZ →</button>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => setStep("lobby")} className="btn-secondary py-2 text-xs">← Back to Home</button>
+            <button onClick={() => setStep("daily")} className="btn-primary py-2 text-xs font-bold">Daily Trivia →</button>
+          </div>
         </section>
       )}
       {step === "daily" && (
         <section className="space-y-3">
-          <div className="paper p-0">
-            <div className="px-4 py-2 cond text-sm" style={{ background: "var(--ink-2)", color: "var(--text-1)" }}>
-              DAILY BOARD • YOU #{daily.youRank} OF 132
+          <DailyList
+            onDone={(xp) => { setDailyEarned((v) => v + xp); }}
+            onBackToHome={() => setStep("lobby")}
+          />
+          {/* Secondary Daily Standings */}
+          <div className="surface overflow-hidden">
+            <div className="px-3.5 py-2 text-xs font-bold tracking-wider border-b border-[var(--border-subtle)] bg-[var(--surface-elevated)] flex justify-between items-center">
+              <span className="uppercase text-white">Daily Standings</span>
+              <span className="font-num text-[11px] text-[var(--brand-gold)] font-semibold">Rank #{daily.youRank} of 132</span>
             </div>
-            <ul className="space-y-1 p-3">
-              {daily.rows.slice(0, 10).map((r, i) => (
-                <li key={r.name + i} className="flex items-center justify-between px-3 py-2 text-sm font-bold"
-                  style={{
-                    background: r.you ? "var(--volt)" : "#fff", color: "#10173a",
-                    clipPath: "polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)",
-                  }}>
-                  <span>#{i + 1} {r.name}{r.you ? " ★ YOU" : ""}</span>
-                  <span className="font-num">{r.xp} XP</span>
-                </li>
+            <div className="divide-y divide-[var(--border-subtle)]">
+              {daily.rows.slice(0, 5).map((r, i) => (
+                <div
+                  key={r.name + i}
+                  className={`flex items-center justify-between px-3.5 py-2 text-xs transition-colors ${
+                    r.you
+                      ? "bg-amber-500/10 text-[var(--brand-gold)] font-semibold"
+                      : "text-[var(--text-primary)] hover:bg-white/[0.02]"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`font-num w-5 font-bold ${r.you ? "text-[var(--brand-gold)]" : "text-[var(--text-muted)]"}`}>
+                      #{i + 1}
+                    </span>
+                    <span className="font-medium">
+                      {r.name}
+                      {r.you && <span className="ml-1 text-[10px] font-bold text-[var(--brand-gold)] uppercase tracking-wide"> (You)</span>}
+                    </span>
+                  </div>
+                  <span className="font-num font-semibold text-white">{r.xp} XP</span>
+                </div>
               ))}
-            </ul>
-            <p className="px-4 pb-3 text-[11px] font-bold">+122 MORE • DAILY FEEDS CARD RARITY</p>
+            </div>
+            <div className="px-3.5 py-2 text-[10px] text-[var(--text-muted)] text-center border-t border-[var(--border-subtle)] bg-[var(--surface-elevated)]/50">
+              Daily trivia progression directly upgrades tonight&apos;s collectible card tier
+            </div>
           </div>
-          <DailyList onDone={(xp) => { setDailyEarned((v) => v + xp); }} />
-          <p className="text-center text-xs" style={{ color: "var(--text-2)" }}>
-            Daily {dailyEarned > 0 ? `+${dailyEarned} banked` : "not played yet"} → you #{daily.youRank} of 132 • card rarity moves with it
-          </p>
-          <button onClick={() => setStep("lobby")} className="btn-volt mt-2 w-full">BACK TO MATCHES</button>
+          <button onClick={() => setStep("lobby")} className="btn-secondary w-full">← Back to Home</button>
         </section>
       )}
 
       {debug && <MockMapModal onClose={() => setDebug(false)} />}
+
+      <MobileNav
+        currentTab={currentTab}
+        onSelectTab={handleSelectTab}
+        isLiveActive={true}
+      />
     </main>
   );
 }

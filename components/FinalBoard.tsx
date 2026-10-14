@@ -3,8 +3,6 @@ import { motion } from "framer-motion";
 import type { Row } from "./Leaderboard";
 
 export default function FinalBoard({ rows, youRank }: { rows: Row[]; youRank: number }) {
-  const reduced = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
   return (
     <div className="paper p-0">
       <div className="px-4 py-2 cond text-sm" style={{ background: "var(--ink-2)", color: "var(--text-1)" }}>
@@ -44,10 +42,9 @@ export default function FinalBoard({ rows, youRank }: { rows: Row[]; youRank: nu
               >
                 <span>
                   #{displayRank} {r.name}
-                  {r.you ? " ★ YOU" : " "}
-                  {displayRank <= 3 && !reduced ? " 🎉" : ""}
+                  {r.you ? " (YOU)" : " "}
                 </span>
-                <span className="font-num">{r.pts}</span>
+                <span className="font-num">{r.pts} PTS</span>
               </motion.div>
             </div>
           );

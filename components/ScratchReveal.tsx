@@ -56,7 +56,7 @@ export default function ScratchReveal({ onReveal }: { onReveal: () => void }) {
     <div className="panel panel-edge volt">
       <div className="panel-inner text-center">
         <h3 className="cond text-2xl">FULL TIME • YOUR CARD IS READY</h3>
-        <p className="text-xs" style={{ color: "var(--text-2)" }}>FINAL BOARD HIDDEN • SITUATIONAL SEALED 🔒</p>
+        <p className="text-xs" style={{ color: "var(--text-2)" }}>FINAL BOARD HIDDEN • SITUATIONAL SEALED</p>
         <div className="relative mx-auto mt-4 h-[320px] overflow-hidden" style={{ touchAction: "none" }}>
           <ParticleBurst fire={burst} />
           <div className="absolute inset-0 grid place-items-center" style={{ background: "var(--volt)", color: "#10173a" }}>
